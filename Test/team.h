@@ -12,17 +12,19 @@ using namespace std;
 class Team {
 
 public:
-
-    string teamName;
-    int count;
-    Team(string teamName) {
-        this->teamName = teamName;
-        count = 0;
-    }
-    Team(){}
-    void didGame();
-    void printTeam();
-    bool operator==(const Team &team) const;
+  string teamName;
+  string teamEventName;
+  int groupNumber;
+  int count;
+  Team(string teamEventName,string teamName ,int groupNumber)
+      : teamEventName(teamEventName), teamName(teamName),groupNumber(groupNumber) {
+    count = 0;
+  }
+  Team() {}
+  void didGame();
+  void printTeam();
+  bool operator==(const Team &team) const;
+  bool operator!=(const Team &team) const;
 };
 
-#endif //TEST_TEAM_H
+#endif // TEST_TEAM_H

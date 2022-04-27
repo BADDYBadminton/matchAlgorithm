@@ -6,38 +6,55 @@
 #include <string>
 #include <vector>
 
-bool cmp(const Match match1, const Match match2) {
-  return match1.count() > match2.count();
-};
-
+bool cmp(const Match match1, const Match match2);
+Match getPriorityMatch();
+string getTeamName();
+static vector<vector<vector<Team>>> teams;
+static vector<Match> matches;
+static int teamCount = 0;
 int main() {
-
   const int total_team_event_cnt = 1;
-  const int gym_court_cnt = 3;
+  const int gym_court_cnt = 9;
   const int leastGameNum = 4;
-  map<string, int> key_apply_cnt{{"혼합단체전 1부", 9}};
+  map<string, int> key_apply_cnt{{"XT 1부", 2},{"MT 2부", 2},{"WT 2부", 2},};
   map<string, map<string, vector<Team>>> groupedTeams;
-
+  teams.reserve(key_apply_cnt.size());
   for (int i = 0; i < key_apply_cnt.size(); i++) {
     auto it = key_apply_cnt.begin();
     advance(it, i);
     groupedTeams.insert({it->first, {}});
     int teamNum = it->second;
-    vector<Team> teamList;
-    for (int j = 0; j < teamNum; ++j) {
-      teamList.push_back(Team(it->first + " " + (char)(j + 65) + "팀"));
-    }
-
+    vector<vector<Team>> tempTeams;
     if (teamNum == 8) {
       vector<Team> vec1;
       vector<Team> vec2;
-      vec1 = vector<Team>(teamList.begin(), teamList.begin() + 4);
-      vec2 = vector<Team>(teamList.begin() + 4, teamList.begin() + 8);
+      for (int j = 0; j < 4; ++j) {
+        string teamName = "";
+        teamName += (char)(j + 65);
+        teamName += "팀";
+        Team(it->first, teamName, 1);
+      }
+      for (int j = 4; j < teamNum; ++j) {
+        string teamName = "";
+        teamName += (char)(j + 65);
+        teamName += "팀";
+        vec2.emplace_back(Team(it->first, teamName, 2));
+      }
+      tempTeams.emplace_back(vec1);
+      tempTeams.emplace_back(vec2);
       for (int j = 0; j < 2; ++j) {
         groupedTeams.at(it->first).insert(
             {{to_string(j + 1) + "조", vec1}, {"2조", vec2}});
       }
     } else if (teamNum <= 5) {
+      vector<Team> teamList;
+      for (int j = 0; j < teamNum; ++j) {
+        string teamName = "";
+        teamName += (char)(j + 65);
+        teamName += "팀";
+        teamList.emplace_back(Team(it->first, teamName, 1));
+      }
+      tempTeams.emplace_back(teamList);
       groupedTeams.at(it->first).insert({"1조", teamList});
     } else {
       int teamExtraNum = (teamNum % leastGameNum);
@@ -45,44 +62,155 @@ int main() {
       for (int j = 0; j < teamExtraNum + teamNorNum; ++j) {
         if (j < teamNorNum) {
           vector<Team> slicedvector;
-          auto start = teamList.begin() + 4 * j;
-          slicedvector = vector<Team>(start, start + leastGameNum);
+          int start = leastGameNum * j;
+          for (int k = start; k < start + leastGameNum; ++k) {
+            string teamName = "";
+            teamName += (char)(k + 65);
+            teamName += "팀";
+            slicedvector.emplace_back(Team(it->first, teamName, j + 1));
+          }
+          tempTeams.emplace_back(slicedvector);
           groupedTeams.at(it->first).insert(
               {to_string(j + 1) + "조", slicedvector});
         } else {
           vector<Team> slicedvector;
-          auto start = teamList.begin() + 4 * j + j - teamNorNum;
-          slicedvector = vector<Team>(start, start + leastGameNum + 1);
+          int start = leastGameNum * j + j - teamNorNum;
+          for (int k = start; k < start + leastGameNum + 1; ++k) {
+            string teamName = "";
+            teamName += (char)(k + 65);
+            teamName += "팀";
+            slicedvector.emplace_back(Team(it->first, teamName, j + 1));
+          }
+          tempTeams.emplace_back(slicedvector);
           groupedTeams.at(it->first).insert(
               {to_string(j + 1) + "조", slicedvector});
         }
       }
     }
+    teams.emplace_back(tempTeams);
   }
 
-
-  // Team team1 = Team("1팀");
-  // Team team2 = Team("2팀");
-  // Team team3 = Team("3팀");
-  // matches.push_back(Match(&team1, &team2, false));
-  // matches.push_back(Match(&team3, &team2, false));
-  // matches.push_back(Match(&team1, &team3, false));
-  // team1.count ++;
-  vector<Match> matches;
-  vector<Team> teamList;
-  int index = 0;
-  for (auto it : groupedTeams) {
-    for (auto secIt : it.second) {
-        vector<Team> v = secIt.second;
-        teamList.insert( teamList.end(),v.begin(), v.end());
-      for (int j = index; j < teamList.size() - 1; j++) {
-        for (int k = j + 1; k < teamList.size(); k++) {
-          matches.emplace_back(&teamList[j], &teamList[k], false);
+  for (int i = 0; i < teams.size(); i++) {
+    for (int j = 0; j < teams.at(i).size(); ++j) {
+      for (int k = 0; k < teams.at(i).at(j).size() - 1; k++) {
+        for (int l = k + 1; l < teams.at(i).at(j).size(); l++) {
+          matches.emplace_back(
+              Match(&teams.at(i).at(j).at(k), &teams.at(i).at(j).at(l), false));
         }
       }
-      index += secIt.second.size();
     }
   }
 
+  vector<vector<Match>> newMatches;
+  while (!matches.empty()) {
+      vector<Match> tempMatches;
+      for (int i = 0; i < gym_court_cnt; ++i) {
+          if(matches.empty())
+              break;
+          tempMatches.emplace_back(getPriorityMatch());
+      }
+      newMatches.emplace_back(tempMatches);
+  }
+    for (int i = 0; i < newMatches.size(); ++i) {
+        for (int j = 0; j <newMatches.at(i).size() ; ++j) {
+            newMatches.at(i).at(j).printMatch();
+            cout<< " ";
+        }
+        cout << endl;
+    }
+
+//  for (int i = 0; i < gym_court_cnt + 1; i++) {
+//    if (i == 0) {
+//      cout << "        ";
+//    } else {
+//      cout << i << "코트                    ";
+//    }
+//  }
+//  cout << endl;
+//
+//  for (int i = 0; i < newMatches.size(); i++) {
+//    if (i % gym_court_cnt == 0) {
+//      cout << i / gym_court_cnt + 1 << "번 경기  ";
+//    }
+//    newMatches[i].printMatch();
+//    cout << "  ";
+//    if (i % gym_court_cnt == gym_court_cnt - 1) {
+//      cout << endl;
+//    }
+//  }
+
+//    return  {
+//            "team_event_group_list",groupedTeams,
+//  };
+return 0;
+}
+
+bool cmp(const Match match1, const Match match2) {
+  int group1 = match1.groupNumber;
+  int group2 = match2.groupNumber;
+  string teamEvent1 = match1.teamEvent;
+  string teamEvent2 = match2.teamEvent;
+  if (match1.count() == match2.count()) {
+    if (!(group1 == group2 && teamEvent2 == teamEvent1)) {
+      int count1 = 0;
+      int count2 = 0;
+      for (auto it : matches) {
+        if (it.groupNumber == group1 && it.teamEvent == teamEvent1) {
+          count1 += 1;
+        } else if (it.groupNumber == group2 && it.teamEvent == teamEvent2) {
+          count2 += 1;
+        }
+      }
+      return count1 > count2;
+    } else {
+        int count1 = 0;
+        int count2 = 0;
+        for (auto it:matches) {
+            if(it.hasTeam(*match1.team1) || it.hasTeam(*match1.team2)){
+                count1++;
+            }
+            if(it.hasTeam(*match2.team1) || it.hasTeam(*match2.team2)){
+                count2++;
+            }
+        }
+        return count1 > count2;
+    }
+  }
+  return match1.count() > match2.count();
+}
+
+Match getPriorityMatch() {
+  if (matches.size() == 1) {
+    Match retMatch(matches.at(0));
+    matches.erase(matches.begin());
+    return retMatch;
+  }
   sort(matches.begin(), matches.end(), cmp);
+  Team *team1 = matches.at(0).team1;
+  Team *team2 = matches.at(0).team2;
+  for (int i = 0; i < teams.size(); i++) {
+    for (int j = 0; j < teams.at(i).size(); j++) {
+      for (int k = 0; k < teams.at(i).at(j).size(); k++) {
+        if (teams.at(i).at(j).at(k) != *team1 &&
+            teams.at(i).at(j).at(k) != *team2) {
+          teams.at(i).at(j).at(k).count++;
+        }
+      }
+    }
+  }
+  Match retMatch(matches.at(0));
+  retMatch.didGame();
+  matches.erase(matches.begin());
+  return retMatch;
+}
+
+string getTeamName(){
+    int fstNum  = teamCount / 26;
+    int secNum  = teamCount % 26;
+    teamCount++;
+    string teamName = "";
+    teamName += (char)(fstNum + 65);
+    teamName += (char)(secNum + 65);
+    teamName += "팀";
+    return  teamName;
 }

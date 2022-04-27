@@ -3,14 +3,14 @@
 //
 
 #include "team.h"
-#include <string>
 #include <iostream>
+#include <string>
 using namespace std;
 
 void Team::didGame() { this->count = 0; }
 bool Team::operator==(const Team &team) const {
-    return team.teamName == this->teamName;
+  return team.teamEventName == this->teamName && team.teamEventName == this->teamName &&
+         team.groupNumber == this->groupNumber;
 }
-void Team::printTeam() {
-    cout<< this->teamName<<endl;
-}
+bool Team::operator!=(const Team &team) const { return !(team == *this); }
+void Team::printTeam() { cout  << this->teamEventName << " "<< this->teamName; }
