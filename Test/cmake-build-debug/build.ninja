@@ -78,18 +78,6 @@ build CMakeFiles/Test.dir/main.cpp.o: CXX_COMPILER__Test_Debug /Users/eugenechoi
   OBJECT_DIR = CMakeFiles/Test.dir
   OBJECT_FILE_DIR = CMakeFiles/Test.dir
 
-build CMakeFiles/Test.dir/team.cpp.o: CXX_COMPILER__Test_Debug /Users/eugenechoi/CProjects/Test/team.cpp || cmake_object_order_depends_target_Test
-  DEP_FILE = CMakeFiles/Test.dir/team.cpp.o.d
-  FLAGS = -g -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.1.sdk -std=gnu++14
-  OBJECT_DIR = CMakeFiles/Test.dir
-  OBJECT_FILE_DIR = CMakeFiles/Test.dir
-
-build CMakeFiles/Test.dir/match.cpp.o: CXX_COMPILER__Test_Debug /Users/eugenechoi/CProjects/Test/match.cpp || cmake_object_order_depends_target_Test
-  DEP_FILE = CMakeFiles/Test.dir/match.cpp.o.d
-  FLAGS = -g -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.1.sdk -std=gnu++14
-  OBJECT_DIR = CMakeFiles/Test.dir
-  OBJECT_FILE_DIR = CMakeFiles/Test.dir
-
 
 # =============================================================================
 # Link build statements for EXECUTABLE target Test
@@ -98,7 +86,7 @@ build CMakeFiles/Test.dir/match.cpp.o: CXX_COMPILER__Test_Debug /Users/eugenecho
 #############################################
 # Link the executable Test
 
-build Test: CXX_EXECUTABLE_LINKER__Test_Debug CMakeFiles/Test.dir/main.cpp.o CMakeFiles/Test.dir/team.cpp.o CMakeFiles/Test.dir/match.cpp.o
+build Test: CXX_EXECUTABLE_LINKER__Test_Debug CMakeFiles/Test.dir/main.cpp.o
   FLAGS = -g -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.1.sdk
   OBJECT_DIR = CMakeFiles/Test.dir
   POST_BUILD = :
